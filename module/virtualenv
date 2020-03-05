@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+red::module::virtualenv() {
+
+  IFS='' read -r venv < <(basename "$VITURAL_ENV" 2>/dev/null)
+
+  [[ "$venv" ]] || return
+
+  red::set module_virtualenv_content "$venv"
+  red::set module_virtualenv_color '#C90'
+  red::set module_virtualenv_symbol_unicode '🐍'
+  red::set module_virtualenv_symbol_ascii 'venv:'
+
+}
+

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+if ! which git &>/dev/null; then
+  red::set module_gitbranch_error "Unable to locate git"
+  return 1
+fi
+
+red::module::gitbranch() {
+
+  local branch=''
+  while read -r line; do
+    if [[ "${line:0:1}" == '*' ]]; then
+      branch="${line:2}"
+      break
+    fi
+  done < <(git branch 2>/dev/null)
+
+  [[ "$branch" == '' ]] && return
+
+  red::set module_gitbranch_content "$branch"
+  red::set module_gitbranch_color '#0FF'
+  red::set module_gitbranch_symbol_powerline ''
+  red::set module_gitbranch_symbol_unicode '⎇'
+  red::set module_gitbranch_symbol_ascii 'branch:'
+
+}
+

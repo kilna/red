@@ -1,0 +1,22 @@
+#!/bin/bash
+
+__red_style_arrow_module() {
+  if __red_powerline; then
+    echo -n ' '
+  else
+    echo -n '> '
+  fi
+}
+
+__red_style_arrow_module_end() {
+  if __red_powerline; then
+    echo -n ' '
+  else
+    echo -n ' >'
+  fi
+}
+
+__red_style_arrow_module_pad() {
+  echo -n ' '
+}
+

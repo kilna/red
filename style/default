@@ -1,0 +1,13 @@
+#!/bin/bash
+
+__red_style_default_default()     { echo -n; }
+__red_style_default_default_end() { echo -n; }
+__red_style_default_user()        { echo -n '{fg:27}'; }
+__red_style_default_host()        { echo -n '{fg:126}'; }
+__red_style_default_dir()         { echo -n '{fg:99}'; }
+__red_style_default_time()        { echo -n '{fg:226}'; }
+__red_style_default_date()        { echo -n '{fg:46}'; }
+__red_style_default_module()      { echo -n '{reverse} '; }
+__red_style_default_module_end()  { echo -n ' '; }
+__red_style_default_module_pad()  { echo -n; }
+

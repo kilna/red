@@ -1,0 +1,6 @@
+#!/bin/bash
+
+__red_style_minimal_module()     { echo -n; }
+__red_style_minimal_module_end() { echo -n; }
+__red_style_minimal_module_pad() { echo -n ' '; }
+

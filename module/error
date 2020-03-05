@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+red::module::error() {
+
+  red::check module_error_last_exit 0 0 && return
+
+  red::set module_error_content "$red_module_error_last_exit"
+  red::set module_error_color '#F00'
+  red::set module_error_symbol_powerline '⚠ '
+  red::set module_error_symbol_unicode '⚠ '
+  red::set module_error_symbol_ascii "E:"
+
+}
+

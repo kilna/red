@@ -1,0 +1,22 @@
+#!/bin/bash
+
+__red_style_fade_module() {
+  if __red_unicode; then
+    echo -n '░▒▓{reverse} '
+  else
+    echo -n '{reverse} '
+  fi
+}
+
+__red_style_fade_module_end() {
+  if __red_unicode; then
+    echo -n ' ░▒▓'
+  else
+    echo -n ' '
+  fi
+}
+
+__red_style_fade_module_pad() {
+  echo -n ' '
+}
+
