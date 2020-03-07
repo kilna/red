@@ -33,11 +33,12 @@ red() {
   local load_modules=(error)
   local show_help=0
   local ar=()
+  local all_modules=0
   while (( $# > 0 )); do
     case "$1" in
       -h|--help)         show_help=1 ;;
       -m|--module)       load_modules+=("$2"); shift ;;
-      #-a|--all-modules)  all_modules=1 ;;
+      -a|--all-modules)  all_modules=1 ;;
       -d|--debug)        red::enable debug ;;
       -l|--powerline)    red::enable powerline ;;
       -w|--doublewide)   red::enable doubelwide ;;
@@ -60,20 +61,21 @@ red() {
   #red::debug "red_root: $red_root"
   #red::debug "red_script: $red_script"
 
-  #if [[ "$all_modules" ]]; then
-  #  load_modules=()
-  #  for module_path in $red_root/module/*; do
-  #    load_modules+=("${module_path##*/}")
-  #  done
-  #fi
-  #unset all_modules
-
   for func in $(red::funcs); do
     case "$func" in red::module::*)
       red::debug "Unsetting $func"
       unset -f $func;;
     esac
   done
+
+  if (( $all_modules )); then
+    load_modules=(error)
+    for module_path in $red_root/module/*; do
+      local module="${module_path##*/}"
+      [[ "${module}" == 'error' ]] && continue
+      load_modules+=("${module}")
+    done
+  fi
 
   red::unset loaded_modules
   for module in "${load_modules[@]}"; do
