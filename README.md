@@ -4,7 +4,7 @@
 
 * RedLine - Modular, stylable prompt
   * Collapsible-to-zero status line
-* RedEye - ANSI color remapper (similar to base16 project)
+* RedEye - ANSI color remapper (similar to base16-shell project)
 * RedAlert - Context-sensitive shell reconfiguration
   * Remap ANSI-colors
   * Change window title
