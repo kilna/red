@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+red::module::terraform() {
+
+  [[ -e .terraform/ ]] || return
+
+  export workspace="$(cat .terraform/environment)"
+  [[ "$workspace" == '' ]] && workspace="default"
+
+  red::set module_terraform_content "$workspace"
+  red::set module_terraform_color '#C3F'
+  red::set module_terraform_symbol_unicode 'ⓣ '
+  red::set module_terraform_symbol_ascii 'tf:'
+
+}
+
