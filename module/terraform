@@ -4,7 +4,7 @@ red::module::terraform() {
 
   [[ -e .terraform/ ]] || return
 
-  export workspace="$(cat .terraform/environment)"
+  export workspace="$(cat .terraform/environment 2>/dev/null)"
   [[ "$workspace" == '' ]] && workspace="default"
 
   red::set module_terraform_content "$workspace"
