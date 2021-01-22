@@ -765,7 +765,7 @@ red::modules() {
       red::style_ansi 'module_pad'
     fi
   fi
-  exit $red_module_error_last_exit
+  return $red_module_error_last_exit
 }
 
 red::ansi_color_depth() {
