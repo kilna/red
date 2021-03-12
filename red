@@ -30,20 +30,19 @@ red() {
 
   eval "$( CFGFLAGS='-c|--config' CFGFILES=$HOME/.redrc? red::cfg "$@" )"
 
-  local load_modules=(error)
+  local load_modules=()
   local show_help=0
   local ar=()
-  local all_modules=0
   while (( $# > 0 )); do
     case "$1" in
       -h|--help)         show_help=1 ;;
       -m|--module)       load_modules+=("$2"); shift ;;
-      -a|--all-modules)  all_modules=1 ;;
+      -a|--all-modules)  : ;; # Deprecated
       -d|--debug)        red::enable debug ;;
       -l|--powerline)    red::enable powerline ;;
       -w|--doublewide)   red::enable doubelwide ;;
       #-b|--bold)         red::enable bold ;;
-      #-s|--style)        red_styles="$2 ${red_styles}"; shift ;;
+      -s|--style)        red::load_style "$2"; shift ;;
       #-u|--user-style)   user_styles+=("$2"); shift ;;
       -c|--colors)       red::set ansi_color_depth "$2"; shift ;;
       *)                 ar+=("$1") ;;
@@ -68,7 +67,7 @@ red() {
     esac
   done
 
-  if (( $all_modules )); then
+  if (( ${#load_modules[@]} == 0 )); then
     load_modules=(error)
     for module_path in $red_root/module/*; do
       local module="${module_path##*/}"
@@ -81,17 +80,17 @@ red() {
   for module in "${load_modules[@]}"; do
     red::debug "Loading module: $module"
     source "${red_root}/module/${module}"
-    IFS='' read -r error < <(red::get module_${module}_error)
-    if [[ "$error" == '' ]] && ! typeset -F red::module::$module &>/dev/null
-    then
-      error="Function red::module::$module is missing"
+    if typeset -F red::module::$module &>/dev/null; then
+      red::addlist loaded_modules $module
+      red::debug "Module $module loaded successfully"
+    elif red::check debug; then
+      local error
+      IFS='' read -r error < <(red::get module_${module}_error)
+      if [[ "$error" == '' ]]; then
+        error="Function red::module::$module is missing"
+      fi
+      red::debug "Module $module: $error"
     fi
-    if [[ "$error" ]]; then
-      echo "Error loading module $module: $error" >&2
-      return 1
-    fi
-    red::addlist loaded_modules $module
-    red::debug "Module $module loaded successfully"
   done
   red::debug Final loaded modules: "${red_loaded_modules[@]}"
 
@@ -402,32 +401,36 @@ export red_style_module_end='{space}{/reverse}'
 export red_style_module_pad='{space}'
 export red_style_module_symbol_pad='{space}'
 
-#red::load_style() {
-#  local file="$1"
-#  local is_unicode=0
-#  local code=''
-#  while IFS='' read line; do
-#    [[ "$line" == '#'* || "$line" =~ ^[[:space:]]*$ ]] && continue
-#    if [[ "$line" != *':'* ]]; then
-#      echo "Unable to parse line '$line' in file '$file'" >&2
-#      continue
-#    else
-#      name="${line%%=*}"
-#      name="${name## }"
-#      name="${name%% }"
-#      val="${line#*=}"
-#      val="${val## }"
-#      val="${val%% }"
-#      #[[ "$val" == *'{u:'* ]] && is_unicode=1
-#      #code+="export red_style_${name^^}='${val//\'/\\\'}'"$'\n';
-#      red::set style_${name} "{$val}"
-#    fi
-#  done < "$1"
-#  #if [[ ! red::unicode && is_unicode ]]; then
-#  #  echo "File '$file' contains unicode style information but terminal is not UTF-8" >&2
-#  #fi
-#  #eval "$code"
-#}
+red::load_style() {
+  local file="$1"
+  if [[ ! -e "$file" && -e "$red_root/style/$file" ]]; then
+    file="$red_root/style/$file"
+  fi
+  red::debug "Loading style $file"
+  local is_unicode=0
+  local code=''
+  while IFS='' read line; do
+    [[ "$line" == '#'* || "$line" =~ ^[[:space:]]*$ ]] && continue
+    if [[ "$line" != *'='* ]]; then
+      echo "Unable to parse line '$line' in file '$file'" >&2
+      continue
+    else
+      name="${line%%=*}"
+      name="${name## }"
+      name="${name%% }"
+      val="${line#*=}"
+      val="${val## }"
+      val="${val%% }"
+      [[ "$val" == *'{u:'* ]] && is_unicode=1
+      code+="red::set style_${name} '${val}'"$'\n';
+    fi
+  done < "$file"
+  if [[ ! red::unicode && is_unicode ]]; then
+    echo "Unable to load style '$file': contains unicode style information but terminal is not UTF-8" >&2
+    return
+  fi
+  eval "$code"
+}
 
 # Parse strings like '{tag}foo{/tag}' into a eval-able set statement to change
 # $@ to the string chunked into a list of '{tag}' 'foo' '{/tag}'
@@ -706,11 +709,13 @@ red::module() {
     eval "local $varname='${value//\'/\'\\\'\'}'"
   done
   red::style_ansi module
-  red::debug 'red::powerline: '$(red::powerline; if [[ "$?" == 0 ]]; then echo true; else echo false; fi )
-  red::debug "symbol_powerline='$symbol_powerline'"
-  red::debug 'red::unicode: '$(red::unicode; if [[ "$?" == 0 ]]; then echo true; else echo false; fi )
-  red::debug "symbol_unicode='$symbol_unicode'"
-  red::debug "symbol_ascii='$symbol_ascii'"
+  if red::check debug; then
+    red::debug 'red::powerline: '$(red::powerline; if [[ "$?" == 0 ]]; then echo true; else echo false; fi )
+    red::debug 'red::unicode: '$(red::unicode; if [[ "$?" == 0 ]]; then echo true; else echo false; fi )
+    red::debug "symbol_powerline='$symbol_powerline'"
+    red::debug "symbol_unicode='$symbol_unicode'"
+    red::debug "symbol_ascii='$symbol_ascii'"
+  fi
   if red::powerline && [[ "$symbol_powerline" ]]; then
     echo -n "$symbol_powerline"
     red::style_ansi module_symbol_pad

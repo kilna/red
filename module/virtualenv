@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if ! which virtualenv &>/dev/null; then
+  red::set module_virtualenv_error "Unable to locate virtualenv"
+  return 1
+fi
+
 red::module::virtualenv() {
 
   IFS='' read -r venv < <(basename "$VITURAL_ENV" 2>/dev/null)

@@ -1,22 +1,4 @@
-#!/bin/bash
-
-__red_style_shortfade_module() {
-  if __red_unicode; then
-    echo -n '▒{reverse} '
-  else
-    echo -n '{reverse} '
-  fi
-}
-
-__red_style_shortfade_module_end() {
-  if __red_unicode; then
-    echo -n ' ▒'
-  else
-    echo -n ' '
-  fi
-}
-
-__red_style_shortfade_module_pad() {
-  echo -n ' '
-}
+module={u:2592}{reverse}{space}
+module_end={space}{u:2592}
+module_pad={space}
 

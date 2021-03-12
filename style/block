@@ -1,24 +1,4 @@
-#!/bin/bash
-
-__red_style_block_module() {
-  if __red_unicode; then
-    echo -n '{reverse}▏'
-  else
-    echo -n '{reverse} '
-  fi
-}
-
-__red_style_block_module_end() {
-  if __red_unicode; then
-    echo -n '▕'
-  else
-    echo -n ' '
-  fi
-}
-
-__red_style_block_module_pad() {
-  if ! __red_unicode; then
-    echo -n ' '
-  fi
-}
+module={reverse}{u:258f}
+module_end={u:2595}
+module_pad=
 

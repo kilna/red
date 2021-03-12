@@ -1,9 +1,0 @@
-user={fg:cyan}
-host={fg:magenta}
-dir={fg:green}
-time={fg:magenta}
-date={fg:magenta}
-module={reverse}{space}
-module_end={space}
-module_pad={space}
-
